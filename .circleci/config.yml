@@ -7,9 +7,9 @@ jobs:
       - checkout
       - restore_cache:
           key: hcsp-{{ checksum "pom.xml" }}
-      - run:
-          name: Verify whitelist
-          command: ./.circleci/verifyWhitelist.sh
+#      - run:
+#          name: Verify whitelist
+#          command: ./.circleci/verifyWhitelist.sh
       - run:
           name: Run Maven tests
           command: mvn clean test
