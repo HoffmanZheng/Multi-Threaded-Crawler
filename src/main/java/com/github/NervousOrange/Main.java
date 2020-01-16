@@ -19,21 +19,38 @@ import java.util.stream.Collectors;
 
 public class Main {
     static HashSet<String> newsLinkPool = new HashSet<>();
-    static HashSet<String> processedLink = new HashSet<>(500);
+    static HashSet<String> processedLink;
+    DatabaseOperation databaseOperation;
 
-    public static void main(String[] args) throws IOException {
-        ArrayList<String> linkPool = new ArrayList<>();
-        linkPool.add("https://sina.cn/");
+    public static void main(String[] args) {
+        Main main = new Main();
+        try {
+            main.run();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        while (!linkPool.isEmpty()) {
-            String link = linkPool.remove(linkPool.size() - 1);
-            if (isInterestLink(link)) {
-                processedLink.add(link);
-                try (CloseableHttpResponse response1 = getHttpResponse(link)) {
-                    HttpEntity entity1 = printStatusLineAndGetEntity(response1);
-                    Document doc = parseEntity(entity1);
-                    linkPool.addAll(getLinkOnThePage(doc));
-                    EntityUtils.consume(entity1);
+    }
+
+    public void run() throws IOException {
+        String databaseURL = "jdbc:h2:file:C:/Users/zch69/recipes/Multi-Threaded-Crawler/CrawlerDatabase";
+        databaseOperation = new DatabaseOperation(databaseURL);
+        databaseOperation.connectDatabase();
+
+        while (true) {  // 循环，每次都重新从数据库加载
+            ArrayList<String> linkPool = databaseOperation.loadLinkFromDatabase("select LINK from LINKS_TO_BE_PROCESSED");
+            processedLink = new HashSet<>(databaseOperation.loadLinkFromDatabase("select LINK from LINKS_ALREADY_PROCESSED"));
+            while (!linkPool.isEmpty()) {
+                String link = linkPool.remove(linkPool.size() - 1);
+                databaseOperation.updateDatabase("DELETE FROM LINKS_TO_BE_PROCESSED WHERE LINK = ?", link);
+                if (isInterestLink(link) && !isLinkAlreadyProcessed(link)) {
+                    databaseOperation.updateDatabase("insert into LINKS_ALREADY_PROCESSED (link) values(?)", link);
+                    try (CloseableHttpResponse response1 = getHttpResponse(link)) {
+                        HttpEntity entity1 = printStatusLineAndGetEntity(response1);
+                        Document doc = parseEntity(entity1);
+                        linkPool.addAll(getLinkOnThePage(doc));
+                        EntityUtils.consume(entity1);
+                    }
                 }
             }
         }
@@ -71,6 +88,10 @@ public class Main {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean isLinkAlreadyProcessed(String link) {
+        return databaseOperation.isLinkInDatabase("SELECT LINK FROM LINKS_ALREADY_PROCESSED WHERE LINK = ?", link);
     }
 
     public static void specialHandleWithGamesLink(String gamesLink) {

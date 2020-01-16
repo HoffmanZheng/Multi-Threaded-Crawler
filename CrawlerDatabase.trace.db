@@ -1,0 +1,102 @@
+2020-01-16 16:32:41 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE LINKS_TO_BE_PROCESSED(LINK VARCHAR(1000))
+
+CREATE[*] TABLE LINKS_ALREADY_PROCESSED(LINK VARCHAR(1000))
+
+
+CREATE TABLE NEWS(
+	ID BIGINT PRIMARY KEY AUTO_INCREMENT,
+	TITLE TEXT,
+	CONTENT TEXT,
+	URL VARCHAR(1000),
+	CREATED_AT TIMESTAMP,
+	MODIFIED_AT TIMESTAMP
+)"; SQL statement:
+create table LINKS_TO_BE_PROCESSED(link varchar(1000))
+
+create table LINKS_ALREADY_PROCESSED(link varchar(1000))
+
+
+create table NEWS(
+	ID bigint primary key auto_increment,
+	TITLE text,
+	CONTENT text,
+	URL varchar(1000),
+	CREATED_AT timestamp,
+	MODIFIED_AT timestamp
+) [42000-200]
+2020-01-16 16:32:51 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE LINKS_TO_BE_PROCESSED(LINK VARCHAR(1000)),[*]
+
+CREATE TABLE LINKS_ALREADY_PROCESSED(LINK VARCHAR(1000)),
+
+
+CREATE TABLE NEWS(
+	ID BIGINT PRIMARY KEY AUTO_INCREMENT,
+	TITLE TEXT,
+	CONTENT TEXT,
+	URL VARCHAR(1000),
+	CREATED_AT TIMESTAMP,
+	MODIFIED_AT TIMESTAMP
+)"; SQL statement:
+create table LINKS_TO_BE_PROCESSED(link varchar(1000)),
+
+create table LINKS_ALREADY_PROCESSED(link varchar(1000)),
+
+
+create table NEWS(
+	ID bigint primary key auto_increment,
+	TITLE text,
+	CONTENT text,
+	URL varchar(1000),
+	CREATED_AT timestamp,
+	MODIFIED_AT timestamp
+) [42000-200]
+2020-01-16 16:32:59 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE LINKS_TO_BE_PROCESSED(LINK VARCHAR(1000)),[*]
+
+CREATE TABLE LINKS_ALREADY_PROCESSED(LINK VARCHAR(1000))"; SQL statement:
+create table LINKS_TO_BE_PROCESSED(link varchar(1000)),
+
+create table LINKS_ALREADY_PROCESSED(link varchar(1000)) [42000-200]
+2020-01-16 16:33:04 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE LINKS_TO_BE_PROCESSED(LINK VARCHAR(1000)),[*]"; SQL statement:
+create table LINKS_TO_BE_PROCESSED(link varchar(1000)), [42000-200]
+2020-01-16 16:33:53 database: flush
+org.h2.message.DbException: General error: "java.lang.IllegalStateException: The file is locked: nio:C:/Users/zch69/recipes/Multi-Threaded-Crawler/CrawlerDatabase.mv.db [1.4.199/7]" [50000-199]
+	at org.h2.message.DbException.get(DbException.java:194)
+	at org.h2.message.DbException.convert(DbException.java:347)
+	at org.h2.mvstore.db.MVTableEngine$1.uncaughtException(MVTableEngine.java:90)
+	at org.h2.mvstore.MVStore.handleException(MVStore.java:2787)
+	at org.h2.mvstore.MVStore.panic(MVStore.java:441)
+	at org.h2.mvstore.MVStore.<init>(MVStore.java:404)
+	at org.h2.mvstore.MVStore$Builder.open(MVStore.java:3343)
+	at org.h2.mvstore.db.MVTableEngine$Store.open(MVTableEngine.java:162)
+	at org.h2.mvstore.db.MVTableEngine.init(MVTableEngine.java:95)
+	at org.h2.engine.Database.getPageStore(Database.java:2739)
+	at org.h2.engine.Database.open(Database.java:769)
+	at org.h2.engine.Database.openDatabase(Database.java:319)
+	at org.h2.engine.Database.<init>(Database.java:313)
+	at org.h2.engine.Engine.openSession(Engine.java:69)
+	at org.h2.engine.Engine.openSession(Engine.java:201)
+	at org.h2.engine.Engine.createSessionAndValidate(Engine.java:178)
+	at org.h2.engine.Engine.createSession(Engine.java:161)
+	at org.h2.engine.Engine.createSession(Engine.java:31)
+	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:336)
+	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:169)
+	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:148)
+	at org.h2.Driver.connect(Driver.java:69)
+	at java.sql.DriverManager.getConnection(DriverManager.java:664)
+	at java.sql.DriverManager.getConnection(DriverManager.java:247)
+	at com.github.NervousOrange.DatabaseOperation.connectDatabase(DatabaseOperation.java:52)
+	at com.github.NervousOrange.Main.run(Main.java:38)
+	at com.github.NervousOrange.Main.main(Main.java:28)
+Caused by: org.h2.jdbc.JdbcSQLNonTransientException: General error: "java.lang.IllegalStateException: The file is locked: nio:C:/Users/zch69/recipes/Multi-Threaded-Crawler/CrawlerDatabase.mv.db [1.4.199/7]" [50000-199]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:502)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:427)
+	... 27 more
+Caused by: java.lang.IllegalStateException: The file is locked: nio:C:/Users/zch69/recipes/Multi-Threaded-Crawler/CrawlerDatabase.mv.db [1.4.199/7]
+	at org.h2.mvstore.DataUtils.newIllegalStateException(DataUtils.java:883)
+	at org.h2.mvstore.FileStore.open(FileStore.java:172)
+	at org.h2.mvstore.MVStore.<init>(MVStore.java:390)
+	... 21 more

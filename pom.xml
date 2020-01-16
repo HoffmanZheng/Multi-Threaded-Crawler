@@ -42,8 +42,12 @@
             <artifactId>jsoup</artifactId>
             <version>1.12.1</version>
         </dependency>
-
-
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.199</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -65,8 +69,8 @@
                     </configuration>
                     <executions>
                         <execution>
-                            <id>compile</id>
-                            <phase>compile</phase>
+                            <id>verify</id>
+                            <phase>verify</phase>
                             <goals>
                                 <goal>check</goal>
                             </goals>
@@ -80,6 +84,28 @@
                         </dependency>
                     </dependencies>
                 </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>3.1.12</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs</artifactId>
+                        <version>4.0.0-beta5</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>verify</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+            </plugin>
         </plugins>
     </build>
 </project>
