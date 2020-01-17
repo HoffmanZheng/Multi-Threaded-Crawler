@@ -5,11 +5,11 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class DatabaseOperation {
+public class DatabaseAccessObject {
     Connection connection;
     String databaseURL;
 
-    public DatabaseOperation(String databaseURL) {
+    public DatabaseAccessObject(String databaseURL) {
         this.databaseURL = databaseURL;
     }
 

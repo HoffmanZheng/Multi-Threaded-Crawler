@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 public class Main {
-    DatabaseOperation databaseOperation;
+    DatabaseAccessObject databaseAccess;
 
     public static void main(String[] args) {
         Main main = new Main();
@@ -31,20 +31,20 @@ public class Main {
 
     public void run() throws IOException {
         String databaseURL = "jdbc:h2:file:C:/Users/zch69/recipes/Multi-Threaded-Crawler/CrawlerDatabase";
-        databaseOperation = new DatabaseOperation(databaseURL);
-        databaseOperation.connectDatabase();
+        databaseAccess = new DatabaseAccessObject(databaseURL);
+        databaseAccess.connectDatabase();
         ArrayList<String> linkPool;
         initialDatabaseFirstTime();
-        while (!(linkPool = databaseOperation.loadLinkFromDatabase("select LINK from LINKS_TO_BE_PROCESSED")).isEmpty()) {  // 循环，每次都重新从数据库加载
+        while (!(linkPool = databaseAccess.loadLinkFromDatabase("select LINK from LINKS_TO_BE_PROCESSED")).isEmpty()) {  // 循环，每次都重新从数据库加载
             String link = linkPool.remove(linkPool.size() - 1);
-            databaseOperation.updateLinkInDatabase("DELETE FROM LINKS_TO_BE_PROCESSED WHERE LINK = ?", link);
+            databaseAccess.updateLinkInDatabase("DELETE FROM LINKS_TO_BE_PROCESSED WHERE LINK = ?", link);
             if (isInterestLink(link) && isLinkNotBeProcessedYet(link)) {
-                databaseOperation.updateLinkInDatabase("insert into LINKS_ALREADY_PROCESSED (link) values(?)", link);
+                databaseAccess.updateLinkInDatabase("insert into LINKS_ALREADY_PROCESSED (link) values(?)", link);
                 try (CloseableHttpResponse response1 = getHttpResponse(link)) {
                     HttpEntity entity1 = printStatusLineAndGetEntity(response1);
                     Document doc = parseEntity(entity1);
                     for (String newsLink : getLinkOnThePage(doc)) {
-                        databaseOperation.updateLinkInDatabase("INSERT INTO LINKS_TO_BE_PROCESSED (link) values (?)", newsLink);
+                        databaseAccess.updateLinkInDatabase("INSERT INTO LINKS_TO_BE_PROCESSED (link) values (?)", newsLink);
                     }
                     EntityUtils.consume(entity1);
                 }
@@ -53,10 +53,10 @@ public class Main {
     }
 
     public void initialDatabaseFirstTime() {
-        ArrayList<String> linkPool = databaseOperation.loadLinkFromDatabase("select LINK from LINKS_TO_BE_PROCESSED");
+        ArrayList<String> linkPool = databaseAccess.loadLinkFromDatabase("select LINK from LINKS_TO_BE_PROCESSED");
         if (linkPool.isEmpty() && isLinkNotBeProcessedYet("http://sina.cn")) {
             try {
-                databaseOperation.initializeDatabase();
+                databaseAccess.initializeDatabase();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -88,7 +88,7 @@ public class Main {
                 String title = doc.select("title").text();
                 Elements paragraphs = doc.select("p");
                 String content = paragraphs.stream().map(Element::text).collect(Collectors.joining("\n"));
-                databaseOperation.writeNewsPagesIntoDatabase("INSERT INTO NEWS (TITLE, CONTENT, URL) VALUES (?, ?, ?)", title, content, newsLink);
+                databaseAccess.writeNewsPagesIntoDatabase("INSERT INTO NEWS (TITLE, CONTENT, URL) VALUES (?, ?, ?)", title, content, newsLink);
                 System.out.println(title);
             }
             EntityUtils.consume(entity1);
@@ -108,7 +108,7 @@ public class Main {
         String title = gamesDoc.select("title").text();
         Elements paragraphs = gamesDoc.select("p");
         String content = paragraphs.stream().map(Element::text).collect(Collectors.joining("\n"));
-        databaseOperation.writeNewsPagesIntoDatabase("INSERT INTO NEWS (TITLE, CONTENT, URL) VALUES (?, ?, ?)", title, content, gamesLink);
+        databaseAccess.writeNewsPagesIntoDatabase("INSERT INTO NEWS (TITLE, CONTENT, URL) VALUES (?, ?, ?)", title, content, gamesLink);
         System.out.println(title);
     }
 
@@ -135,7 +135,7 @@ public class Main {
     }
 
     public boolean isLinkNotBeProcessedYet(String link) {
-        return !databaseOperation.isLinkInDatabase("SELECT LINK FROM LINKS_ALREADY_PROCESSED WHERE LINK = ?", link);
+        return !databaseAccess.isLinkInDatabase("SELECT LINK FROM LINKS_ALREADY_PROCESSED WHERE LINK = ?", link);
     }
 
     private static HttpEntity printStatusLineAndGetEntity(CloseableHttpResponse response1) {
