@@ -15,17 +15,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-public class Crawler {
+public class Crawler extends Thread{
     CrawlerDAO databaseAccess;
 
-    private void createDAOObjectAndConnect() {
-        databaseAccess = new MyBatisCrawlerDAO();
+    public Crawler(CrawlerDAO databaseAccess) {
+        this.databaseAccess = databaseAccess;
     }
 
-    public void run() throws IOException {
-        createDAOObjectAndConnect();
-        String linkLoadFromDatabase;             // 循环，每次都重新从数据库加载
-        while ((linkLoadFromDatabase = databaseAccess.loadLinkFromDatabase()) != null) {
+    @Override
+    public void run() {
+        String linkLoadFromDatabase;            // 循环，每次都重新从数据库加载
+        while ((linkLoadFromDatabase = loadLinkFromDatabase()) != null) {
             if (isLinkNotBeProcessedYet(linkLoadFromDatabase)) {
                 if (isANewsLink(linkLoadFromDatabase)) {
                     getNewsTitleAndContent(linkLoadFromDatabase);
@@ -39,7 +39,11 @@ public class Crawler {
         }
     }
 
-    private void dealWithTheInterestLink(String link) throws IOException {
+    private String loadLinkFromDatabase() {
+        return databaseAccess.loadLinkFromDatabaseAndDelete();
+    }
+
+    private void dealWithTheInterestLink(String link) {
         try (CloseableHttpResponse response1 = getHttpResponse(link)) {
             HttpEntity entity1 = printStatusLineAndGetEntity(response1);
             Document doc = parseEntity(entity1);
@@ -47,6 +51,8 @@ public class Crawler {
                 databaseAccess.insertLinkInLinkToBeProcessed(newsLink);
             }
             EntityUtils.consume(entity1);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -62,7 +68,7 @@ public class Crawler {
         return linkFromPage;
     }
 
-    public void getNewsTitleAndContent(String link) throws IOException {
+    public void getNewsTitleAndContent(String link) {
         System.out.println("A News Link: " + link);
         Document newsDoc;
         try (CloseableHttpResponse response1 = getHttpResponse(link)) {
@@ -75,6 +81,8 @@ public class Crawler {
             databaseAccess.writeNewsPagesIntoDatabase(title, content, link);
             System.out.println(title);
             EntityUtils.consume(entity1);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -116,5 +124,3 @@ public class Crawler {
         return Jsoup.parse(html);
     }
 }
-
-

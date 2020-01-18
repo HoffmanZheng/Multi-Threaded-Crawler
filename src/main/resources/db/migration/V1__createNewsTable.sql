@@ -1,3 +1,5 @@
+
+
 create table NEWS(
 	ID bigint primary key auto_increment,
 	TITLE text,

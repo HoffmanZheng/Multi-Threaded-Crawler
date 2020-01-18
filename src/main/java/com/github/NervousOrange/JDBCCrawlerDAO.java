@@ -4,11 +4,11 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.sql.*;
 
-public class DatabaseAccessObject implements CrawlerDAO {
+public class JDBCCrawlerDAO implements CrawlerDAO {
     Connection connection;
     static final String databaseURL = "jdbc:h2:file:C:/Users/zch69/recipes/Multi-Threaded-Crawler/CrawlerDatabase";
 
-    public DatabaseAccessObject() {
+    public JDBCCrawlerDAO() {
         connectDatabase();
     }
 
@@ -23,13 +23,14 @@ public class DatabaseAccessObject implements CrawlerDAO {
     }
 
     @Override
-    public String loadLinkFromDatabase() {
+    public synchronized String loadLinkFromDatabaseAndDelete() {
         ResultSet resultSet = null;
         String linkToBeProcessed = null;
         try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT LINK FROM LINKS_TO_BE_PROCESSED LIMIT 1")) {
             resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 linkToBeProcessed = (resultSet.getString(1));
+                deleteLinkInDatabase(linkToBeProcessed);
             }
         } catch (SQLException e) {
             e.printStackTrace();
