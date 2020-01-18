@@ -1,0 +1,1 @@
+insert into LINKS_TO_BE_PROCESSED (link) values ('http://sina.cn');
