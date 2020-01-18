@@ -16,28 +16,26 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 public class Crawler {
-    DatabaseAccessObject databaseAccess;
+    CrawlerDAO databaseAccess;
 
     private void createDAOObjectAndConnect() {
-        databaseAccess = new DatabaseAccessObject();
-        databaseAccess.connectDatabase();
+        databaseAccess = new MyBatisCrawlerDAO();
     }
 
     public void run() throws IOException {
         createDAOObjectAndConnect();
-        ArrayList<String> linkPool;             // 循环，每次都重新从数据库加载
-        while (!(linkPool = databaseAccess.loadLinkFromDatabase("select LINK from LINKS_TO_BE_PROCESSED")).isEmpty()) {
-            String link = linkPool.remove(linkPool.size() - 1);
-            if (isLinkNotBeProcessedYet(link)) {
-                if (isANewsLink(link)) {
-                    getNewsTitleAndContent(link);
+        String linkLoadFromDatabase;             // 循环，每次都重新从数据库加载
+        while ((linkLoadFromDatabase = databaseAccess.loadLinkFromDatabase()) != null) {
+            if (isLinkNotBeProcessedYet(linkLoadFromDatabase)) {
+                if (isANewsLink(linkLoadFromDatabase)) {
+                    getNewsTitleAndContent(linkLoadFromDatabase);
                 }
-                if (isInterestLink(link)) {
-                    dealWithTheInterestLink(link);
+                if (isInterestLink(linkLoadFromDatabase)) {
+                    dealWithTheInterestLink(linkLoadFromDatabase);
                 }
-                databaseAccess.updateLinkInDatabase("insert into LINKS_ALREADY_PROCESSED (link) values(?)", link);
+                databaseAccess.insertLinkInLinkAlreadyProcessed(linkLoadFromDatabase);
             }
-            databaseAccess.updateLinkInDatabase("DELETE FROM LINKS_TO_BE_PROCESSED WHERE LINK = ?", link);
+            databaseAccess.deleteLinkInDatabase(linkLoadFromDatabase);
         }
     }
 
@@ -46,7 +44,7 @@ public class Crawler {
             HttpEntity entity1 = printStatusLineAndGetEntity(response1);
             Document doc = parseEntity(entity1);
             for (String newsLink : getLinkOnThePage(doc)) {
-                databaseAccess.updateLinkInDatabase("INSERT INTO LINKS_TO_BE_PROCESSED (link) values (?)", newsLink);
+                databaseAccess.insertLinkInLinkToBeProcessed(newsLink);
             }
             EntityUtils.consume(entity1);
         }
@@ -66,7 +64,7 @@ public class Crawler {
 
     public void getNewsTitleAndContent(String link) throws IOException {
         System.out.println("A News Link: " + link);
-        Document newsDoc = null;
+        Document newsDoc;
         try (CloseableHttpResponse response1 = getHttpResponse(link)) {
             HttpEntity entity1 = printStatusLineAndGetEntity(response1);
             newsDoc = Jsoup.parse(entity1.getContent(), "UTF-8", link);
@@ -74,7 +72,7 @@ public class Crawler {
             String title = newsDoc.select("title").text();
             Elements paragraphs = newsDoc.select("p");
             String content = paragraphs.stream().map(Element::text).collect(Collectors.joining("\n"));
-            databaseAccess.writeNewsPagesIntoDatabase("INSERT INTO NEWS (TITLE, CONTENT, URL, CREATED_AT, MODIFIED_AT) VALUES (?, ?, ?, now(), now())", title, content, link);
+            databaseAccess.writeNewsPagesIntoDatabase(title, content, link);
             System.out.println(title);
             EntityUtils.consume(entity1);
         }
@@ -92,7 +90,7 @@ public class Crawler {
     private static boolean isInterestLink(String link) {
         return link.contains("sina.cn") && (!link.contains("reload")) && (!link.contains("tousu"))
                 && !link.contains("video.sina.cn") && !link.contains("book.sina.cn") && !link.contains("k.sina.cn")
-                && !link.contains("my.sina.cn") && !(link.equals("//sina.cn")) && !link.contains("auto.sina.cn");
+                && !link.contains("my.sina.cn") && !(link.equals("//sina.cn")) && !link.contains("auto.sina.cn") && !link.contains("so.sina.cn");
     }
 
     private static boolean isANewsLink(String tempLink) {
@@ -105,7 +103,7 @@ public class Crawler {
     }
 
     public boolean isLinkNotBeProcessedYet(String link) {
-        return !databaseAccess.isLinkInDatabase("SELECT LINK FROM LINKS_ALREADY_PROCESSED WHERE LINK = ?", link);
+        return !databaseAccess.isLinkInDatabase(link);
     }
 
     private static HttpEntity printStatusLineAndGetEntity(CloseableHttpResponse response1) {

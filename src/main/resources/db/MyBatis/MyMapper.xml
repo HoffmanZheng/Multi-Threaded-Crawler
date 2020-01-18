@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.NervousOrange.CrawlerMapper">
+    <select id="loadLinkFromDatabase" resultType="String">
+        SELECT LINK FROM LINKS_TO_BE_PROCESSED LIMIT 1
+    </select>
+    <select id="isLinkInDatabase" parameterType="String" resultType="int">
+        SELECT COUNT(LINK) FROM LINKS_ALREADY_PROCESSED WHERE LINK = #{link}
+    </select>
+    <insert id="insertLinkIntoDatabase" parameterType="HashMap">
+        INSERT INTO
+        <choose>
+            <when test="tableName == 'LINKS_TO_BE_PROCESSED'">
+                LINKS_TO_BE_PROCESSED
+            </when>
+            <otherwise>
+                LINKS_ALREADY_PROCESSED
+            </otherwise>
+        </choose>
+        (LINK) values (#{link})
+    </insert>
+    <delete id="deleteLINKS_TO_BE_PROCESSED" parameterType="String">
+        DELETE FROM LINKS_TO_BE_PROCESSED where LINK = #{LINK}
+    </delete>
+    <insert id="insertNews" parameterType="com.github.NervousOrange.News">
+        INSERT INTO NEWS (TITLE, CONTENT, URL, CREATED_AT, MODIFIED_AT)
+        VALUES (#{title}, #{content}, #{URL}, now(), now())
+    </insert>
+</mapper>
+
