@@ -1,7 +1,7 @@
 package com.github.NervousOrange;
 
 public interface CrawlerDAO {
-    String loadLinkFromDatabase();
+    String loadLinkFromDatabaseAndDelete();
 
     void insertLinkInLinkToBeProcessed(String link);
 
