@@ -7,11 +7,7 @@ import java.util.ArrayList;
 
 public class DatabaseAccessObject {
     Connection connection;
-    String databaseURL;
-
-    public DatabaseAccessObject(String databaseURL) {
-        this.databaseURL = databaseURL;
-    }
+    String databaseURL = "jdbc:h2:file:C:/Users/zch69/recipes/Multi-Threaded-Crawler/CrawlerDatabase";
 
     public ArrayList<String> loadLinkFromDatabase(String sqlStatement) {
         ResultSet resultSet = null;
@@ -35,17 +31,10 @@ public class DatabaseAccessObject {
         return linksFromDatabase;
     }
 
+    // insert or delete a link
     public void updateLinkInDatabase(String sqlStatement, String link) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement)) {
             preparedStatement.setString(1, link);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void updateLinkInDatabase(String sqlStatement) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement)) {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -89,16 +78,6 @@ public class DatabaseAccessObject {
     public void connectDatabase() {
         try {
             connection = DriverManager.getConnection(this.databaseURL, "root", "root");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void initializeDatabase() throws SQLException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO LINKS_TO_BE_PROCESSED (link) values (?)")) {
-            preparedStatement.setString(1, "http://sina.cn");
-            preparedStatement.executeUpdate();
-            updateLinkInDatabase("DELETE FROM LINKS_ALREADY_PROCESSED");
         } catch (SQLException e) {
             e.printStackTrace();
         }
