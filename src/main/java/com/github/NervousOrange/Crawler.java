@@ -54,6 +54,7 @@ public class Crawler implements Runnable {
         }
     }
 
+
     private void dealWithTheInterestLink(String link) {
         try (CloseableHttpResponse response1 = getHttpResponse(link)) {
             HttpEntity entity1 = printStatusLineAndGetEntity(response1);
@@ -104,6 +105,7 @@ public class Crawler implements Runnable {
         if (link.startsWith("//")) {
             link = "http:" + link;
         }
+
         HttpGet httpGet = new HttpGet(link);
         httpGet.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36");
         return httpclient.execute(httpGet);
