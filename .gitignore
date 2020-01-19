@@ -23,6 +23,7 @@
 target/
 *.db
 ./*.db
+*.sql
 
 
 

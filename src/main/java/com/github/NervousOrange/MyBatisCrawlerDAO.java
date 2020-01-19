@@ -29,7 +29,7 @@ public class MyBatisCrawlerDAO implements CrawlerDAO {
     @Override
     public synchronized String loadLinkFromDatabaseAndDelete() {
         try (SqlSession session = sqlSessionFactory.openSession()) {
-            String linkLoadFromDatabase = (String) session.selectOne("com.github.NervousOrange.CrawlerMapper.loadLinkFromDatabase");
+            String linkLoadFromDatabase = session.selectOne("com.github.NervousOrange.CrawlerMapper.loadLinkFromDatabase");
             deleteLinkInDatabase(linkLoadFromDatabase);
             return linkLoadFromDatabase;
         }
