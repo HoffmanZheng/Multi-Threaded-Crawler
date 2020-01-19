@@ -13,10 +13,17 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
-public class Crawler extends Thread{
+public class Crawler implements Runnable {
     CrawlerDAO databaseAccess;
+    CountDownLatch latch;
+
+    public Crawler(CrawlerDAO databaseAccess, CountDownLatch latch) {
+        this.databaseAccess = databaseAccess;
+        this.latch = latch;
+    }
 
     public Crawler(CrawlerDAO databaseAccess) {
         this.databaseAccess = databaseAccess;
@@ -24,24 +31,29 @@ public class Crawler extends Thread{
 
     @Override
     public void run() {
-        String linkLoadFromDatabase;            // 循环，每次都重新从数据库加载
-        while ((linkLoadFromDatabase = loadLinkFromDatabase()) != null) {
-            if (isLinkNotBeProcessedYet(linkLoadFromDatabase)) {
-                if (isANewsLink(linkLoadFromDatabase)) {
-                    getNewsTitleAndContent(linkLoadFromDatabase);
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        try {
+            String linkLoadFromDatabase;            // 循环，每次都重新从数据库加载
+            while ((linkLoadFromDatabase = databaseAccess.loadLinkFromDatabaseAndDelete()) != null) {
+                if (isLinkNotBeProcessedYet(linkLoadFromDatabase)) {
+                    if (isANewsLink(linkLoadFromDatabase)) {
+                        getNewsTitleAndContent(linkLoadFromDatabase);
+                    }
+                    if (isInterestLink(linkLoadFromDatabase)) {
+                        dealWithTheInterestLink(linkLoadFromDatabase);
+                    }
+                    databaseAccess.insertLinkInLinkAlreadyProcessed(linkLoadFromDatabase);
                 }
-                if (isInterestLink(linkLoadFromDatabase)) {
-                    dealWithTheInterestLink(linkLoadFromDatabase);
-                }
-                databaseAccess.insertLinkInLinkAlreadyProcessed(linkLoadFromDatabase);
             }
-            databaseAccess.deleteLinkInDatabase(linkLoadFromDatabase);
+        } finally {
+            latch.countDown();
         }
     }
 
-    private String loadLinkFromDatabase() {
-        return databaseAccess.loadLinkFromDatabaseAndDelete();
-    }
 
     private void dealWithTheInterestLink(String link) {
         try (CloseableHttpResponse response1 = getHttpResponse(link)) {
@@ -90,6 +102,10 @@ public class Crawler extends Thread{
     private static CloseableHttpResponse getHttpResponse(String link) throws IOException {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         System.out.println("Visiting Link: " + link);
+        if (link.startsWith("//")) {
+            link = "http:" + link;
+        }
+
         HttpGet httpGet = new HttpGet(link);
         httpGet.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36");
         return httpclient.execute(httpGet);
@@ -98,7 +114,8 @@ public class Crawler extends Thread{
     private static boolean isInterestLink(String link) {
         return link.contains("sina.cn") && (!link.contains("reload")) && (!link.contains("tousu"))
                 && !link.contains("video.sina.cn") && !link.contains("book.sina.cn") && !link.contains("k.sina.cn")
-                && !link.contains("my.sina.cn") && !(link.equals("//sina.cn")) && !link.contains("auto.sina.cn") && !link.contains("so.sina.cn");
+                && !link.contains("my.sina.cn") && !link.contains("auto.sina.cn") && !link.contains("so.sina.cn")
+                && !link.contains("\"/'\"/");
     }
 
     private static boolean isANewsLink(String tempLink) {
@@ -107,7 +124,8 @@ public class Crawler extends Thread{
 
     private static boolean isLinkUseful(String tempLink) {
         return !tempLink.contains("javascript") && !tempLink.contains("void") && !(tempLink.length() < 2)
-                && !tempLink.contains("php?") && !tempLink.contains("live") && !tempLink.contains("passport.sina.cn");
+                && !tempLink.contains("php?") && !tempLink.contains("live") && !tempLink.contains("passport.sina.cn")
+                && !tempLink.contains("\"/'\"/") && tempLink.length() < 3000;
     }
 
     public boolean isLinkNotBeProcessedYet(String link) {
