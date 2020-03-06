@@ -100,7 +100,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>8.29</version>
+                            <version>8.22</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -130,9 +130,9 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>5.2.4</version>
                 <configuration>
-                    <url>jdbc:mysql://localhost:3306/crawler?characterEncoding=utf-8</url>
+                    <url>jdbc:mysql://localhost:3306/crawler?characterEncoding=utf-8&amp;createDatabaseIfNotExist=true</url>
                     <user>root</user>
-                    <password>root</password>
+                    <password>123456</password>
                 </configuration>
                 <dependencies>
                     <dependency>

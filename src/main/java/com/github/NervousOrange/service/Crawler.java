@@ -1,5 +1,6 @@
-package com.github.NervousOrange;
+package com.github.NervousOrange.service;
 
+import com.github.NervousOrange.dao.CrawlerDAO;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;

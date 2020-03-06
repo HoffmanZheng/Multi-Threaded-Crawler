@@ -1,14 +1,14 @@
-package com.github.NervousOrange;
+package com.github.NervousOrange.dao;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.sql.*;
 
-public class JDBCCrawlerDAO implements CrawlerDAO {
+public class H2JdbcDAO implements CrawlerDAO {
     Connection connection;
     static final String databaseURL = "jdbc:h2:file:C:/Users/zch69/recipes/Multi-Threaded-Crawler/CrawlerDatabase";
 
-    public JDBCCrawlerDAO() {
+    public H2JdbcDAO() {
         connectDatabase();
     }
 
@@ -110,5 +110,4 @@ public class JDBCCrawlerDAO implements CrawlerDAO {
         }
         return false;
     }
-
 }

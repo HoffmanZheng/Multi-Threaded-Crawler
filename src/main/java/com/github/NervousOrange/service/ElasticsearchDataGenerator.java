@@ -1,5 +1,6 @@
-package com.github.NervousOrange;
+package com.github.NervousOrange.service;
 
+import com.github.NervousOrange.entity.News;
 import org.apache.http.HttpHost;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;

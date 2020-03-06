@@ -1,4 +1,9 @@
 package com.github.NervousOrange;
+
+import com.github.NervousOrange.dao.CrawlerDAO;
+import com.github.NervousOrange.dao.MySQLDAO;
+import com.github.NervousOrange.service.Crawler;
+
 import java.util.concurrent.CountDownLatch;
 
 
@@ -10,7 +15,7 @@ public class Main {
 
     public static void runCrawler() {
         final CountDownLatch latch = new CountDownLatch(4);
-        CrawlerDAO databaseAccess = new MyBatisCrawlerDAO();
+        CrawlerDAO databaseAccess = new MySQLDAO();
         Crawler crawler = new Crawler(databaseAccess, latch);
 
         while (true) {
