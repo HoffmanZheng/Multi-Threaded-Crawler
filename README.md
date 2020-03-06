@@ -1,6 +1,4 @@
 # Multi-Threaded-Crawler
-<<<<<<< HEAD
-
 [![](https://img.shields.io/badge/Circle-CI-brightgreen)](https://circleci.com/gh/NervousOrange/Multi-Threaded-Crawler) [![](https://img.shields.io/badge/微信-联系作者-brightgreen)](https://s2.ax1x.com/2020/03/06/3bV0L8.jpg)
 
 ### 多线程网络爬虫与Elasticsearch新闻搜索引擎
@@ -46,7 +44,7 @@ mvn verify
 
 ### 效果图：
 
-![image-20200306102850469](../../AppData/Roaming/Typora/typora-user-images/image-20200306102850469.png)
+![爬虫效果图](https://s2.ax1x.com/2020/03/06/3LEpHU.png)
 
 ### 爬虫逻辑图：
 
