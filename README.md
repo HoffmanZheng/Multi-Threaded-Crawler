@@ -1,4 +1,5 @@
 # Multi-Threaded-Crawler
+<<<<<<< HEAD
 
 [![](https://img.shields.io/badge/Circle-CI-brightgreen)](https://circleci.com/gh/NervousOrange/Multi-Threaded-Crawler) [![](https://img.shields.io/badge/微信-联系作者-brightgreen)](https://s2.ax1x.com/2020/03/06/3bV0L8.jpg)
 
@@ -50,3 +51,4 @@ mvn verify
 ### 爬虫逻辑图：
 
 ![](https://s2.ax1x.com/2020/03/06/3bZrX6.png)
+
