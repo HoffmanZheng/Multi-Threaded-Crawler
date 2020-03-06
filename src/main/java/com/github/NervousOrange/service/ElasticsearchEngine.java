@@ -1,4 +1,4 @@
-package com.github.NervousOrange;
+package com.github.NervousOrange.service;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.http.HttpHost;

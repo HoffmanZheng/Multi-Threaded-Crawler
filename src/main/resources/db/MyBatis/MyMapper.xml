@@ -24,7 +24,7 @@
     <delete id="deleteLINKS_TO_BE_PROCESSED" parameterType="String">
         DELETE FROM LINKS_TO_BE_PROCESSED where LINK = #{LINK}
     </delete>
-    <insert id="insertNews" parameterType="com.github.NervousOrange.News">
+    <insert id="insertNews" parameterType="com.github.NervousOrange.entity.News">
         INSERT INTO NEWS (TITLE, CONTENT, URL, CREATED_AT, MODIFIED_AT)
         VALUES (#{title}, #{content}, #{URL}, now(), now())
     </insert>

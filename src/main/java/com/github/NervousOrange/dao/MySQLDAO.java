@@ -1,5 +1,6 @@
-package com.github.NervousOrange;
+package com.github.NervousOrange.dao;
 
+import com.github.NervousOrange.entity.News;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -9,10 +10,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 
-public class MyBatisCrawlerDAO implements CrawlerDAO {
+public class MySQLDAO implements CrawlerDAO {
     private SqlSessionFactory sqlSessionFactory;
 
-    public MyBatisCrawlerDAO() {
+    public MySQLDAO() {
         String resource = "db/MyBatis/config.xml";
         InputStream inputStream;
         {

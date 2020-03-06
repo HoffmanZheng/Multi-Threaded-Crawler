@@ -1,4 +1,4 @@
-package com.github.NervousOrange;
+package com.github.NervousOrange.dao;
 
 public interface CrawlerDAO {
     String loadLinkFromDatabaseAndDelete();
